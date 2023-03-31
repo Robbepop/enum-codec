@@ -48,13 +48,20 @@ pub trait Visitor {
     type Output;
 }
 
-/// A reference to an encoded `Item` in an `Encoder`.
+/// A pointer to an encoded `Item` in an `Encoder`.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Key<Encoder: ?Sized, Item: ?Sized> {
     /// The index at which the encoded `Item` resides in the `Encoder`.
-    index: usize,
+    index: RawKey,
     /// Marker to trick the Rust compiler that `Encoder` is in use.
     marker_encoder: PhantomData<fn() -> Encoder>,
     /// Marker to trick the Rust compiler that `Item` is in use.
     marker_item: PhantomData<fn() -> Item>,
+}
+
+/// A raw pointer to an encoded `Item` in an `Encoder`.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct RawKey {
+    /// The relative index into the encoded buffer where the encoded item resides.
+    index: usize,
 }
