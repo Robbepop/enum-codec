@@ -1,6 +1,8 @@
+#![no_std]
+
 pub use enum_ref::{EnumMut, EnumRef};
 pub use enum_tag::EnumTag;
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 /// Implemented by Rust `enum` types that allow for space-efficient encoding.
 pub trait EnumCodec: EnumRef + EnumMut {
