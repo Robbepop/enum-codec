@@ -44,6 +44,7 @@ pub trait DecodeVisit<V: Visitor>: Encode {
 
 /// Trait implemented by decode visitors.
 pub trait Visitor {
+    /// The common output type of all visit methods of the visitor.
     type Output;
 }
 
