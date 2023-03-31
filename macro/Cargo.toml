@@ -1,0 +1,23 @@
+[package]
+name = "enum-codec-macro"
+version = "0.1.0"
+documentation = "https://docs.rs/enum-codec-macro/"
+description = "Proc. macro implementation for the `enum-codec` crate."
+authors.workspace = true
+repository.workspace = true
+edition.workspace = true
+readme.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "2.0.0"
+proc-macro2 = "1.0.0"
+quote = "1.0.0"
+
+[dev-dependencies]
+enum-codec = { path = ".." }
