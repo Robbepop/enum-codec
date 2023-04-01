@@ -1,13 +1,12 @@
 #![no_std]
 
-pub use enum_ref::{EnumMut, EnumRef};
-pub use enum_tag::EnumTag;
+use enum_ref::{EnumMut, EnumRef};
 use core::marker::PhantomData;
 
 /// Implemented by Rust `enum` types that allow for space-efficient encoding.
 pub trait EnumCodec: EnumRef + EnumMut {
     /// Generated type used to encode instances of `enum` type `Self`.
-    type Encoder: Encode<Item = Self> + Decode;
+    type Encoder: Encode<Item = Self> + Decode + DecodeMut;
 }
 
 /// Trait implemented by generated `enum` encoders to encode items.
@@ -15,30 +14,34 @@ pub trait Encode {
     /// The key type used to uniquely identify encoded items.
     type Key;
 
-    /// The type of the `enum` that the [`Encoder`] can encode.
-    ///
-    /// This way the [`Encoder`] can derive the `enum` tag type and others.
+    /// The type of the `enum` that is encoded.
     type Item;
 
-    /// Encodes the `enum` value for the [`Encoder`] and returns a reference to it.
+    /// Encodes the `enum` value and returns a reference to it.
     fn encode(&mut self, value: &Self::Item) -> Key<Self, Self::Item>;
 }
 
-/// Trait implemented by generated `enum` encoders to decode items.
+/// Trait implemented by generated `enum` encoders to return shared references to encoded items.
 pub trait Decode: Encode
 where
-    <Self as Encode>::Item: EnumRef + EnumMut,
+    <Self as Encode>::Item: EnumRef,
 {
-    /// Decode the `enum` value encoded in the [`Encoder`] and returns a copy of it.
+    /// Decode the encoded `enum` value at `key` and returns a shared reference to it.
     fn decode(&self, eref: Self::Key) -> Option<<Self::Item as EnumRef>::Ref<'_>>;
+}
 
-    /// Decode the `enum` value encoded in the [`Encoder`] and returns a copy of it.
+/// Trait implemented by generated `enum` encoders to return exclusive references to encoded items.
+pub trait DecodeMut: Encode
+where
+    <Self as Encode>::Item: EnumMut,
+{
+    /// Decode the encoded `enum` value at `key` and returns an exclusive reference to it.
     fn decode_mut(&mut self, eref: Self::Key) -> Option<<Self::Item as EnumMut>::Mut<'_>>;
 }
 
 /// Trait implemented by generated `enum` encoders to efficiently decode and visit items.
 pub trait DecodeVisit<V: Visitor>: Encode {
-    /// Decode the `enum` value encoded in the [`Encoder`] and returns a copy of it.
+    /// Decode the encoded `enum` value and calls the respective visit method.
     fn decode_visit(&self, key: Self::Key, visitor: &mut V) -> <V as Visitor>::Output;
 }
 
